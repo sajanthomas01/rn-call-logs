@@ -3,6 +3,7 @@ package com.rncalllogs
 import android.provider.CallLog
 import com.facebook.react.bridge.*
 import java.lang.Exception
+import java.math.BigInteger
 
 
 class RnCallLogsModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
@@ -12,10 +13,10 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) : Reac
   }
 
   private val projection = listOf<String>(CallLog.Calls._ID, CallLog.Calls.NUMBER, CallLog.Calls.TYPE, CallLog.Calls.DURATION,
-    CallLog.Calls.DATE, CallLog.Calls.COUNTRY_ISO, CallLog.Calls.CACHED_NAME)
+    CallLog.Calls.DATE, CallLog.Calls.COUNTRY_ISO)
 
-  private val startEpoch: Int = 1606326809;
-  private val stopEpoch: Int = 1607622809;
+  private val startEpoch: Long = 1614156464062;
+  private val stopEpoch: Long = 1607944588068;
 
   // Example method
   // See https://reactnative.dev/docs/native-modules-android
@@ -28,6 +29,7 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) : Reac
 
   @ReactMethod
   fun getAllLogs(limit: Int = 0, skip: Int = 0, promise: Promise) {
+
     fetchCallLogs(promise);
   }
 
@@ -68,8 +70,9 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) : Reac
     try {
       val result = Arguments.createArray()
 
-      val selectionQuery = "${CallLog.Calls.DATE} BETWEEN $startEpoch AND $stopEpoch";
-      val cursor = reactContext.contentResolver.query(CallLog.Calls.CONTENT_URI, projection.toTypedArray(), selectionQuery, projection.toTypedArray(), "DESC")
+      val selectionQuery = "${CallLog.Calls.DATE} BETWEEN $stopEpoch  AND $startEpoch";
+      val cursor = reactContext.contentResolver.query(CallLog.Calls.CONTENT_URI, projection.toTypedArray(), selectionQuery, null,
+        "${CallLog.Calls.DATE} DESC")
       when (cursor?.count) {
         null -> {
           promise.reject("Error");
@@ -78,8 +81,9 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) : Reac
           promise.resolve(result);
         }
         else -> {
+          System.out.println("======================COUNT==========="+cursor.count)
           cursor?.apply {
-            val nameIndex = getColumnIndex(CallLog.Calls.CACHED_NAME);
+//            val nameIndex = getColumnIndex(CallLog.Calls.CACHED_NAME);
             val numberIndex = getColumnIndex(CallLog.Calls.NUMBER);
             val typeIndex = getColumnIndex(CallLog.Calls.TYPE);
             val dateIndex = getColumnIndex(CallLog.Calls.DATE);
@@ -90,7 +94,7 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) : Reac
 
               val logData = Arguments.createMap()
 
-              logData.putString("name", getString(nameIndex));
+//              logData.putString("name", getString(nameIndex));
               logData.putString("number", getString(numberIndex));
               logData.putString("date", getString(dateIndex));
               logData.putString("duration", getString(durationIndex));
@@ -106,6 +110,11 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) : Reac
         }
       }
     } catch (e: Exception) {
+      System.out.println("=================================")
+        System.out.println("=================================")
+          System.out.println(e)
+            System.out.println("=================================")
+              System.out.println("=================================")
       promise.reject("Error")
     }
   }

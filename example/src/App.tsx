@@ -1,13 +1,37 @@
 import * as React from 'react';
 
-import { StyleSheet, View, Text } from 'react-native';
-import RnCallLogs from 'rn-call-logs';
+import { StyleSheet, View, Text, PermissionsAndroid } from 'react-native';
+import { multiply, getAllLogs } from 'rn-call-logs';
 
 export default function App() {
   const [result, setResult] = React.useState<number | undefined>();
 
+  const checker = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_CALL_LOG,
+        {
+          title: 'Call Log Example',
+          message: 'Access your call logs',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        }
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        const x = await getAllLogs(0, 0);
+        console.log('x=', x);
+      } else {
+        console.log('Call Log permission denied');
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   React.useEffect(() => {
-    RnCallLogs.multiply(3, 7).then(setResult);
+    multiply(3, 7).then(setResult);
+    checker();
   }, []);
 
   return (
