@@ -3,58 +3,337 @@ package com.rncalllogs
 import android.provider.CallLog
 import com.facebook.react.bridge.*
 import java.lang.Exception
-import java.math.BigInteger
 
 
-class RnCallLogsModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+class RnCallLogsModule(private val reactContext: ReactApplicationContext) :
+  ReactContextBaseJavaModule(reactContext) {
 
   override fun getName(): String {
     return "RnCallLogs"
   }
 
-  private val projection = listOf<String>(CallLog.Calls._ID, CallLog.Calls.NUMBER, CallLog.Calls.TYPE, CallLog.Calls.DURATION,
-    CallLog.Calls.DATE, CallLog.Calls.COUNTRY_ISO)
+  private val projection = listOf<String>(
+    CallLog.Calls._ID, CallLog.Calls.NUMBER, CallLog.Calls.TYPE, CallLog.Calls.DURATION,
+    CallLog.Calls.DATE, CallLog.Calls.COUNTRY_ISO
+  )
 
-  private val startEpoch: Long = 1614156464062;
-  private val stopEpoch: Long = 1607944588068;
+  private val startEpoch: Long = 1624091607141; // latest num
+  private val stopEpoch: Number = 1607580908735; //old num
+  private var selectionQuery: String? = null;
+  private var filterSet: String? = "${CallLog.Calls.DATE} DESC";
 
   // Example method
   // See https://reactnative.dev/docs/native-modules-android
   @ReactMethod
   fun multiply(a: Int, b: Int, promise: Promise) {
-
     promise.resolve(a * b)
-
   }
 
   @ReactMethod
-  fun getAllLogs(limit: Int = 0, skip: Int = 0, promise: Promise) {
-
-    fetchCallLogs(promise);
+  fun getAllLogs(@androidx.annotation.Nullable filter: ReadableMap, promise: Promise) {
+    if (queryMaker(filter, "all"))
+      fetchCallLogs(promise);
   }
 
   @ReactMethod
-  fun getOutgoingLogs(limit: Int = 0, skip: Int = 0, promise: Promise) {
-
+  fun getOutgoingLogs(@androidx.annotation.Nullable filter: ReadableMap, promise: Promise) {
+    if (queryMaker(filter, "outgoing"))
+      fetchCallLogs(promise);
   }
 
   @ReactMethod
-  fun getIncomingLogs(limit: Int = 0, skip: Int = 0, promise: Promise) {
-
+  fun getIncomingLogs(@androidx.annotation.Nullable filter: ReadableMap, promise: Promise) {
+    if (queryMaker(filter, "incoming"))
+      fetchCallLogs(promise);
   }
 
   @ReactMethod
-  fun getMissedLogs(limit: Int = 0, skip: Int = 0, promise: Promise) {
-
+  fun getMissedLogs(@androidx.annotation.Nullable filter: ReadableMap, promise: Promise) {
+    if (queryMaker(filter, "missed"))
+      fetchCallLogs(promise);
   }
 
   @ReactMethod
-  fun getNotConnectedLogs(limit: Int = 0, skip: Int = 0, promise: Promise) {
-
+  fun getRejectedLogs(@androidx.annotation.Nullable filter: ReadableMap, promise: Promise) {
+    if (queryMaker(filter, "rejected"))
+      fetchCallLogs(promise);
   }
+
+  @ReactMethod
+  fun getBlockedLogs(@androidx.annotation.Nullable filter: ReadableMap, promise: Promise) {
+    if (queryMaker(filter, "blocked"))
+      fetchCallLogs(promise);
+  }
+
+  @ReactMethod
+  fun getExternallyAnsweredLogs(
+    @androidx.annotation.Nullable filter: ReadableMap,
+    promise: Promise
+  ) {
+    if (queryMaker(filter, "externalAnswer"))
+      fetchCallLogs(promise);
+  }
+
+  @ReactMethod
+  fun getByNumber(@androidx.annotation.Nullable filter: ReadableMap, promise: Promise) {
+    if (queryMaker(filter, "byNumber"))
+      fetchCallLogs(promise);
+  }
+
+
+  @ReactMethod
+  fun getNotConnectedLogs(@androidx.annotation.Nullable filter: ReadableMap, promise: Promise) {
+    if (queryMaker(filter, "notConnected"))
+      fetchCallLogs(promise);
+  }
+
+  //TODO: optimize the query, entire thing looks ugly although it works :D
+  private fun queryMaker(filter: ReadableMap, type: String): Boolean {
+    // reset things
+    filterSet = "${CallLog.Calls.DATE} DESC";
+    selectionQuery = null;
+
+    when (type) {
+      "notConnected" -> {
+        selectionQuery =
+          if (filter.getDouble("fromEpoch") > 0.0 && filter.getDouble("toEpoch") > 0.0) {
+            "${CallLog.Calls.DATE} BETWEEN ${
+              filter.getDouble("toEpoch").toString()
+            }  AND ${filter.getDouble("fromEpoch").toString()} AND " +
+              "${CallLog.Calls.DURATION} = 0 AND ${CallLog.Calls.TYPE} = ${CallLog.Calls.OUTGOING_TYPE}";
+
+          } else {
+            "${CallLog.Calls.DURATION} = 0 AND ${CallLog.Calls.TYPE} = ${CallLog.Calls.OUTGOING_TYPE}"
+          }
+
+        if (filter.hasKey("limit") && filter.getInt("limit") > 0) {
+          filterSet = "$filterSet LIMIT ${filter.getInt("limit")}"
+        }
+
+        if (filter.hasKey("skip") && filter.getInt("skip") > 0) {
+          filterSet = "$filterSet OFFSET ${filter.getInt("skip")}"
+        }
+        return true;
+      }
+
+      "byNumber" -> {
+
+        selectionQuery =
+          if (filter.getDouble("fromEpoch") > 0.0 && filter.getDouble("toEpoch") > 0.0) {
+            "${CallLog.Calls.DATE} BETWEEN ${
+              filter.getDouble("toEpoch").toString()
+            }  AND ${filter.getDouble("fromEpoch").toString()}" +
+              " AND ${CallLog.Calls.NUMBER} LIKE '%${filter.getString("phoneNumber")}%'";
+
+          } else {
+            "${CallLog.Calls.NUMBER} LIKE '%${filter.getString("phoneNumber")}%'";
+          }
+
+        if (filter.hasKey("type") && filter.getString("type").equals("INCOMING")) {
+          selectionQuery =
+            "$selectionQuery AND ${CallLog.Calls.TYPE} = ${CallLog.Calls.INCOMING_TYPE}"
+        }
+
+        if (filter.hasKey("type") && filter.getString("type").equals("OUTGOING")) {
+          selectionQuery =
+            "$selectionQuery AND ${CallLog.Calls.TYPE} = ${CallLog.Calls.OUTGOING_TYPE}"
+        }
+
+        if (filter.hasKey("type") && filter.getString("type").equals("MISSED")) {
+          selectionQuery =
+            "$selectionQuery AND ${CallLog.Calls.TYPE} = ${CallLog.Calls.MISSED_TYPE}"
+        }
+
+        if (filter.hasKey("type") && filter.getString("type").equals("VOICEMAIL")) {
+          selectionQuery =
+            "$selectionQuery AND ${CallLog.Calls.TYPE} = ${CallLog.Calls.VOICEMAIL_TYPE}"
+        }
+
+        if (filter.hasKey("type") && filter.getString("type").equals("REJECTED")) {
+          selectionQuery =
+            "$selectionQuery AND ${CallLog.Calls.TYPE} = ${CallLog.Calls.REJECTED_TYPE}"
+        }
+
+        if (filter.hasKey("type") && filter.getString("type").equals("BLOCKED")) {
+          selectionQuery =
+            "$selectionQuery AND ${CallLog.Calls.TYPE} = ${CallLog.Calls.BLOCKED_TYPE}"
+        }
+
+        if (filter.hasKey("type") && filter.getString("type").equals("EXTERNAL")) {
+          selectionQuery =
+            "$selectionQuery AND ${CallLog.Calls.TYPE} = ${CallLog.Calls.ANSWERED_EXTERNALLY_TYPE}"
+        }
+
+        if (filter.hasKey("limit") && filter.getInt("limit") > 0) {
+          filterSet = "$filterSet LIMIT ${filter.getInt("limit")}"
+        }
+
+        if (filter.hasKey("skip") && filter.getInt("skip") > 0) {
+          filterSet = "$filterSet OFFSET ${filter.getInt("skip")}"
+        }
+        return true;
+      }
+
+      "externalAnswer" -> {
+        selectionQuery =
+          if (filter.getDouble("fromEpoch") > 0.0 && filter.getDouble("toEpoch") > 0.0) {
+            "${CallLog.Calls.DATE} BETWEEN ${
+              filter.getDouble("toEpoch").toString()
+            }  AND ${filter.getDouble("fromEpoch").toString()} AND " +
+              "${CallLog.Calls.TYPE} = ${CallLog.Calls.ANSWERED_EXTERNALLY_TYPE}";
+
+          } else {
+            "${CallLog.Calls.TYPE} = ${CallLog.Calls.ANSWERED_EXTERNALLY_TYPE}"
+          }
+
+        if (filter.hasKey("limit") && filter.getInt("limit") > 0) {
+          filterSet = "$filterSet LIMIT ${filter.getInt("limit")}"
+        }
+
+        if (filter.hasKey("skip") && filter.getInt("skip") > 0) {
+          filterSet = "$filterSet OFFSET ${filter.getInt("skip")}"
+        }
+        return true;
+      }
+
+      "blocked" -> {
+        selectionQuery =
+          if (filter.getDouble("fromEpoch") > 0.0 && filter.getDouble("toEpoch") > 0.0) {
+            "${CallLog.Calls.DATE} BETWEEN ${
+              filter.getDouble("toEpoch").toString()
+            }  AND ${filter.getDouble("fromEpoch").toString()} AND " +
+              "${CallLog.Calls.TYPE} = ${CallLog.Calls.BLOCKED_TYPE}";
+
+          } else {
+            "${CallLog.Calls.TYPE} = ${CallLog.Calls.BLOCKED_TYPE}"
+          }
+
+        if (filter.hasKey("limit") && filter.getInt("limit") > 0) {
+          filterSet = "$filterSet LIMIT ${filter.getInt("limit")}"
+        }
+
+        if (filter.hasKey("skip") && filter.getInt("skip") > 0) {
+          filterSet = "$filterSet OFFSET ${filter.getInt("skip")}"
+        }
+        return true;
+      }
+
+      "rejected" -> {
+        selectionQuery =
+          if (filter.getDouble("fromEpoch") > 0.0 && filter.getDouble("toEpoch") > 0.0) {
+            "${CallLog.Calls.DATE} BETWEEN ${
+              filter.getDouble("toEpoch").toString()
+            }  AND ${filter.getDouble("fromEpoch").toString()} AND " +
+              "${CallLog.Calls.TYPE} = ${CallLog.Calls.REJECTED_TYPE}";
+
+          } else {
+            "${CallLog.Calls.TYPE} = ${CallLog.Calls.REJECTED_TYPE}"
+          }
+
+        if (filter.hasKey("limit") && filter.getInt("limit") > 0) {
+          filterSet = "$filterSet LIMIT ${filter.getInt("limit")}"
+        }
+
+        if (filter.hasKey("skip") && filter.getInt("skip") > 0) {
+          filterSet = "$filterSet OFFSET ${filter.getInt("skip")}"
+        }
+        return true;
+      }
+
+      "missed" -> {
+        selectionQuery =
+          if (filter.getDouble("fromEpoch") > 0.0 && filter.getDouble("toEpoch") > 0.0) {
+            "${CallLog.Calls.DATE} BETWEEN ${
+              filter.getDouble("toEpoch").toString()
+            }  AND ${filter.getDouble("fromEpoch").toString()} AND " +
+              "${CallLog.Calls.TYPE} = ${CallLog.Calls.MISSED_TYPE}";
+
+          } else {
+            "${CallLog.Calls.TYPE} = ${CallLog.Calls.MISSED_TYPE}"
+          }
+
+        if (filter.hasKey("limit") && filter.getInt("limit") > 0) {
+          filterSet = "$filterSet LIMIT ${filter.getInt("limit")}"
+        }
+
+        if (filter.hasKey("skip") && filter.getInt("skip") > 0) {
+          filterSet = "$filterSet OFFSET ${filter.getInt("skip")}"
+        }
+        return true;
+      }
+
+      "incoming" -> {
+        selectionQuery =
+          if (filter.getDouble("fromEpoch") > 0.0 && filter.getDouble("toEpoch") > 0.0) {
+            "${CallLog.Calls.DATE} BETWEEN ${
+              filter.getDouble("toEpoch").toString()
+            }  AND ${filter.getDouble("fromEpoch").toString()} AND " +
+              "${CallLog.Calls.TYPE} = ${CallLog.Calls.INCOMING_TYPE}";
+
+          } else {
+            "${CallLog.Calls.TYPE} = ${CallLog.Calls.INCOMING_TYPE}"
+          }
+
+        if (filter.hasKey("limit") && filter.getInt("limit") > 0) {
+          filterSet = "$filterSet LIMIT ${filter.getInt("limit")}"
+        }
+
+        if (filter.hasKey("skip") && filter.getInt("skip") > 0) {
+          filterSet = "$filterSet OFFSET ${filter.getInt("skip")}"
+        }
+        return true;
+      }
+
+      "outgoing" -> {
+        selectionQuery =
+          if (filter.getDouble("fromEpoch") > 0.0 && filter.getDouble("toEpoch") > 0.0) {
+            "${CallLog.Calls.DATE} BETWEEN ${
+              filter.getDouble("toEpoch").toString()
+            }  AND ${filter.getDouble("fromEpoch").toString()} AND " +
+              "${CallLog.Calls.TYPE} = ${CallLog.Calls.OUTGOING_TYPE}";
+
+          } else {
+            "${CallLog.Calls.TYPE} = ${CallLog.Calls.OUTGOING_TYPE}"
+          }
+
+        if (filter.hasKey("limit") && filter.getInt("limit") > 0) {
+          filterSet = "$filterSet LIMIT ${filter.getInt("limit")}"
+        }
+
+        if (filter.hasKey("skip") && filter.getInt("skip") > 0) {
+          filterSet = "$filterSet OFFSET ${filter.getInt("skip")}"
+        }
+        return true;
+      }
+
+      "all" -> {
+        selectionQuery =
+          if (filter.getDouble("fromEpoch") > 0.0 && filter.getDouble("toEpoch") > 0.0) {
+            "${CallLog.Calls.DATE} BETWEEN ${
+              filter.getDouble("toEpoch").toString()
+            }  AND ${filter.getDouble("fromEpoch").toString()}";
+
+          } else {
+            ""
+          }
+
+        if (filter.hasKey("limit") && filter.getInt("limit") > 0) {
+          filterSet = "$filterSet LIMIT ${filter.getInt("limit")}"
+        }
+
+        if (filter.hasKey("skip") && filter.getInt("skip") > 0) {
+          filterSet = "$filterSet OFFSET ${filter.getInt("skip")}"
+        }
+        return true;
+      }
+
+    }
+    return false;
+  }
+
 
   private fun callTypeMaker(typeId: Int): String {
-    return when(typeId){
+    return when (typeId) {
       CallLog.Calls.INCOMING_TYPE -> "INCOMING";
       CallLog.Calls.OUTGOING_TYPE -> "OUTGOING";
       CallLog.Calls.MISSED_TYPE -> "MISSED";
@@ -70,9 +349,10 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) : Reac
     try {
       val result = Arguments.createArray()
 
-      val selectionQuery = "${CallLog.Calls.DATE} BETWEEN $stopEpoch  AND $startEpoch";
-      val cursor = reactContext.contentResolver.query(CallLog.Calls.CONTENT_URI, projection.toTypedArray(), selectionQuery, null,
-        "${CallLog.Calls.DATE} DESC")
+      val cursor = reactContext.contentResolver.query(
+        CallLog.Calls.CONTENT_URI, projection.toTypedArray(), selectionQuery, null,
+        filterSet
+      )
       when (cursor?.count) {
         null -> {
           promise.reject("Error");
@@ -81,9 +361,7 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) : Reac
           promise.resolve(result);
         }
         else -> {
-          System.out.println("======================COUNT==========="+cursor.count)
           cursor?.apply {
-//            val nameIndex = getColumnIndex(CallLog.Calls.CACHED_NAME);
             val numberIndex = getColumnIndex(CallLog.Calls.NUMBER);
             val typeIndex = getColumnIndex(CallLog.Calls.TYPE);
             val dateIndex = getColumnIndex(CallLog.Calls.DATE);
@@ -94,14 +372,13 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) : Reac
 
               val logData = Arguments.createMap()
 
-//              logData.putString("name", getString(nameIndex));
               logData.putString("number", getString(numberIndex));
               logData.putString("date", getString(dateIndex));
               logData.putString("duration", getString(durationIndex));
               logData.putString("country", getString(countryIndex));
               logData.putString("type", callTypeMaker(getInt(typeIndex)));
               result.pushMap(logData);
-              // end of while loop
+
             }
             cursor.close();
             promise.resolve(result)
@@ -111,11 +388,11 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) : Reac
       }
     } catch (e: Exception) {
       System.out.println("=================================")
-        System.out.println("=================================")
-          System.out.println(e)
-            System.out.println("=================================")
-              System.out.println("=================================")
-      promise.reject("Error")
+      System.out.println("=================================")
+      System.out.println(e)
+      System.out.println("=================================")
+      System.out.println("=================================")
+      promise.reject(e.message)
     }
   }
 }

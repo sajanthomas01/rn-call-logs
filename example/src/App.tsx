@@ -1,7 +1,13 @@
 import * as React from 'react';
 
 import { StyleSheet, View, Text, PermissionsAndroid } from 'react-native';
-import { multiply, getAllLogs } from 'rn-call-logs';
+import {
+  multiply,
+  getAllLogs,
+  getNotConnectedLogs,
+  getByNumber,
+  getMissedLogs,
+} from 'rn-call-logs';
 
 export default function App() {
   const [result, setResult] = React.useState<number | undefined>();
@@ -19,7 +25,25 @@ export default function App() {
         }
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        const x = await getAllLogs(0, 0);
+        // const x = await getNotConnectedLogs({
+        //   fromEpoch: 0,
+        //   toEpoch: 0,
+        //   limit: 5,
+        // });
+
+        // const x = await getByNumber({
+        //   fromEpoch: 0,
+        //   toEpoch: 0,
+        //   phoneNumber: '9995492179',
+        //   limit: 20,
+        //   type: 'OUTGOING',
+        // });
+
+        const x = await getMissedLogs({
+          fromEpoch: 0,
+          toEpoch: 0,
+          limit: 10,
+        });
         console.log('x=', x);
       } else {
         console.log('Call Log permission denied');
