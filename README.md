@@ -166,11 +166,90 @@ const styles = StyleSheet.create({
 });
 
 ```
+## Response format on success
+```
+[
+ {
+    number: string; // phone number
+    date: string; // epoch timestamp
+    duration: string; // duration in seconds
+    country: string; // 2 letter country code 
+    type: string; // type of call ( 'INCOMING', 'OUTGOING','MISSED', 'VOICEMAIL',  
+                                    'REJECTED', 'BLOCKED', 'EXTERNAL')
+  }
+]
+```
+
+## Available Methods
+* getAllLogs()
+
+```js
+getAllLogs({ fromEpoch: 0,toEpoch: 0, }); 
+// fromEpoch and toEpoch are mandatory fields to get all data pass 0 as value for each.
+// to get data in a date range pass epoch time in milliseconds
+```
+* getOutgoingLogs()
+```js
+getOutgoingLogs({ fromEpoch: 0,toEpoch: 0, }); 
+// fromEpoch and toEpoch are mandatory fields to get all data pass 0 as value for each.
+// to get data in a date range pass epoch time in milliseconds
+```
+* getIncomingLogs()
+```js
+getIncomingLogs({ fromEpoch: 0,toEpoch: 0, }); 
+// fromEpoch and toEpoch are mandatory fields to get all data pass 0 as value for each.
+// to get data in a date range pass epoch time in milliseconds
+```
+* getMissedLogs()
+```js
+getMissedLogs({ fromEpoch: 0,toEpoch: 0, }); 
+// fromEpoch and toEpoch are mandatory fields to get all data pass 0 as value for each.
+// to get data in a date range pass epoch time in milliseconds
+```
+* getRejectedLogs()
+```js
+getRejectedLogs({ fromEpoch: 0,toEpoch: 0, }); 
+// fromEpoch and toEpoch are mandatory fields to get all data pass 0 as value for each.
+// to get data in a date range pass epoch time in milliseconds
+```
+* getBlockedLogs()
+```js
+getBlockedLogs({ fromEpoch: 0,toEpoch: 0, }); 
+// fromEpoch and toEpoch are mandatory fields to get all data pass 0 as value for each.
+// to get data in a date range pass epoch time in milliseconds
+```
+* getExternallyAnsweredLogs()
+```js
+getExternallyAnsweredLogs({ fromEpoch: 0,toEpoch: 0, }); 
+// fromEpoch and toEpoch are mandatory fields to get all data pass 0 as value for each.
+// to get data in a date range pass epoch time in milliseconds
+```
+* getNotConnectedLogs() //calls you made but didn't connected
+```js
+getNotConnectedLogs({ fromEpoch: 0,toEpoch: 0, }); 
+// fromEpoch and toEpoch are mandatory fields to get all data pass 0 as value for each.
+// to get data in a date range pass epoch time in milliseconds
+```
+* getByNumber()
+```js
+getByNumber({ fromEpoch: 0,toEpoch: 0,phoneNumber: 123456789 }); 
+// fromEpoch, toEpoch and phoneNumber are mandatory fields 
+// to get all data pass 0 as value for fromEpoch and toEpoch.
+// to get data in a date range pass epoch time in milliseconds
+```
+## Options
+| key                      | type   | Required | Description                                                                                                                            |
+|--------------------------|--------|----------|----------------------------------------------------------------------------------------------------------------------------------------|
+| fromEpoch                | Number | true     | Starting time in epoch (milliseconds) for date  based filtering, pass 0 for retrieving all data                                        |
+| toEpoch                  | Number | true     | Endingtime in epoch (milliseconds) for date  based filtering, pass 0 for retrieving all data                                           |
+| limit                    | Number | optional | To limit the results                                                                                                                   |
+| skip                     | Number | optional | To skip rows from result                                                                                                               |
+| phoneNumber(getByNumber) | String | true     | To search with a specific mobile number(only for getByNumber, do remember to omit country codes for getting better results)            |
+| type(getByNumber)        | Enum   | Optional |  'INCOMING', 'OUTGOING', 'MISSED', 'VOICEMAIL',  'REJECTED', 'BLOCKED', 'EXTERNAL', 'ALL'  To reterive only results of a specific type |
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-Please make sure to update tests as appropriate.
 
 [readme made with - makereadme.com](https://www.makeareadme.com/)
 ## License
