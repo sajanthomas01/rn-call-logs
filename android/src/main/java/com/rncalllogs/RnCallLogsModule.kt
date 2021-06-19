@@ -1,6 +1,15 @@
+/**
+ * Author : Sajan Thomas(https://sajan.dev)
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ *
+ */
+
 package com.rncalllogs
 
 import android.provider.CallLog
+import android.util.Log
 import com.facebook.react.bridge.*
 import java.lang.Exception
 
@@ -16,9 +25,6 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) :
     CallLog.Calls._ID, CallLog.Calls.NUMBER, CallLog.Calls.TYPE, CallLog.Calls.DURATION,
     CallLog.Calls.DATE, CallLog.Calls.COUNTRY_ISO
   )
-
-  private val startEpoch: Long = 1624091607141; // latest num
-  private val stopEpoch: Number = 1607580908735; //old num
   private var selectionQuery: String? = null;
   private var filterSet: String? = "${CallLog.Calls.DATE} DESC";
 
@@ -387,11 +393,7 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) :
         }
       }
     } catch (e: Exception) {
-      System.out.println("=================================")
-      System.out.println("=================================")
-      System.out.println(e)
-      System.out.println("=================================")
-      System.out.println("=================================")
+      Log.d("RN-CALL-LOG-ERROR", e.message)
       promise.reject(e.message)
     }
   }

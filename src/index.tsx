@@ -1,11 +1,10 @@
 import { NativeModules } from 'react-native';
 
 interface LogArrayData {
-  name?: string;
   number: string;
-  date?: string;
+  date: string;
   duration: string;
-  country?: string;
+  country: string;
   type: string;
 }
 
@@ -35,17 +34,15 @@ interface commonFilterWithNumber {
 
 type RnCallLogsType = {
   multiply(a: number, b: number): Promise<number>;
-  getAllLogs(filter: commonFilter): Promise<[LogArrayData] | string>;
-  getOutgoingLogs(filter: commonFilter): Promise<[LogArrayData] | string>;
-  getIncomingLogs(filter: commonFilter): Promise<[LogArrayData] | string>;
-  getMissedLogs(filter: commonFilter): Promise<[LogArrayData] | string>;
-  getRejectedLogs(filter: commonFilter): Promise<[LogArrayData] | string>;
-  getBlockedLogs(filter: commonFilter): Promise<[LogArrayData] | string>;
-  getExternallyAnsweredLogs(
-    filter: commonFilter
-  ): Promise<[LogArrayData] | string>;
-  getByNumber(filter: commonFilterWithNumber): Promise<[LogArrayData] | string>;
-  getNotConnectedLogs(filter: commonFilter): Promise<[LogArrayData] | string>;
+  getAllLogs(filter: commonFilter): Promise<[LogArrayData] | []>;
+  getOutgoingLogs(filter: commonFilter): Promise<[LogArrayData] | []>;
+  getIncomingLogs(filter: commonFilter): Promise<[LogArrayData] | []>;
+  getMissedLogs(filter: commonFilter): Promise<[LogArrayData] | []>;
+  getRejectedLogs(filter: commonFilter): Promise<[LogArrayData] | []>;
+  getBlockedLogs(filter: commonFilter): Promise<[LogArrayData] | []>;
+  getExternallyAnsweredLogs(filter: commonFilter): Promise<[LogArrayData] | []>;
+  getByNumber(filter: commonFilterWithNumber): Promise<[LogArrayData] | []>;
+  getNotConnectedLogs(filter: commonFilter): Promise<[LogArrayData] | []>;
 };
 
 const { RnCallLogs } = NativeModules;
