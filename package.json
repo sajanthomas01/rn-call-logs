@@ -1,7 +1,7 @@
 {
   "name": "rn-call-logs",
-  "version": "0.1.0",
-  "description": "Package for reading call logs(Android)",
+  "version": "0.1.1",
+  "description": "React native package for reading call logs(Android)",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/index.d.ts",
@@ -34,7 +34,11 @@
   "keywords": [
     "react-native",
     "ios",
-    "android"
+    "android",
+    "react-native-call-log",
+    "rn-call-logs",
+    "react native call log",
+    "react-native-package"
   ],
   "repository": "https://github.com/sajanthomas01/rn-call-logs.git",
   "author": "sajanthomas01 <info@sajan.dev> (https://sajan.dev)",
