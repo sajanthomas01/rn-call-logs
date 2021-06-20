@@ -8,10 +8,9 @@ import {
   FlatList,
   TouchableWithoutFeedback,
 } from 'react-native';
-import {
-  multiply,
-  getAllLogs,
-  getOutgoingLogs,
+import { getAllLogs } from 'rn-call-logs';
+/* 
+* getOutgoingLogs,
   getIncomingLogs,
   getMissedLogs,
   getRejectedLogs,
@@ -19,19 +18,17 @@ import {
   getExternallyAnsweredLogs,
   getByNumber,
   getNotConnectedLogs,
-} from 'rn-call-logs';
+*/
+
+interface logResponse {
+  number: string;
+  date: string;
+  duration: string;
+  country: string;
+  type: string;
+}
 
 export default function App() {
-  //interfaces
-  interface logResponse {
-    number: string;
-    date: string;
-    duration: string;
-    country: string;
-    type: string;
-  }
-
-  const [result, setResult] = React.useState<number | undefined>();
   const [logs, setLogs] = React.useState<[logResponse] | []>();
 
   const getLogs = async () => {
@@ -83,7 +80,6 @@ export default function App() {
   };
 
   React.useEffect(() => {
-    multiply(3, 7).then(setResult);
     getLogs();
   }, []);
 

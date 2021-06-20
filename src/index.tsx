@@ -33,7 +33,6 @@ interface commonFilterWithNumber {
 }
 
 type RnCallLogsType = {
-  multiply(a: number, b: number): Promise<number>;
   getAllLogs(filter: commonFilter): Promise<[LogArrayData] | []>;
   getOutgoingLogs(filter: commonFilter): Promise<[LogArrayData] | []>;
   getIncomingLogs(filter: commonFilter): Promise<[LogArrayData] | []>;
@@ -49,7 +48,6 @@ const { RnCallLogs } = NativeModules;
 const RNCallLog = RnCallLogs as RnCallLogsType;
 const {
   getAllLogs,
-  multiply,
   getOutgoingLogs,
   getIncomingLogs,
   getMissedLogs,
@@ -61,7 +59,6 @@ const {
 } = RNCallLog;
 export {
   getAllLogs,
-  multiply,
   getOutgoingLogs,
   getIncomingLogs,
   getMissedLogs,

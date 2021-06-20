@@ -28,12 +28,6 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) :
   private var selectionQuery: String? = null;
   private var filterSet: String? = "${CallLog.Calls.DATE} DESC";
 
-  // Example method
-  // See https://reactnative.dev/docs/native-modules-android
-  @ReactMethod
-  fun multiply(a: Int, b: Int, promise: Promise) {
-    promise.resolve(a * b)
-  }
 
   @ReactMethod
   fun getAllLogs(@androidx.annotation.Nullable filter: ReadableMap, promise: Promise) {
