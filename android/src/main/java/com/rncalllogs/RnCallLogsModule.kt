@@ -355,7 +355,7 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) :
       )
       when (cursor?.count) {
         null -> {
-          promise.reject("Error");
+          promise.reject("Error","Cursor returned null");
         }
         0 -> {
           promise.resolve(result);
@@ -388,7 +388,7 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) :
       }
     } catch (e: Exception) {
       Log.d("RN-CALL-LOG-ERROR", e.message)
-      promise.reject(e.message)
+      promise.reject("Error",e.message)
     }
   }
 }
