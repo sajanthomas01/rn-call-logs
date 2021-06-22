@@ -98,8 +98,8 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) :
         selectionQuery =
           if (filter.getDouble("fromEpoch") > 0.0 && filter.getDouble("toEpoch") > 0.0) {
             "${CallLog.Calls.DATE} BETWEEN ${
-              filter.getDouble("toEpoch").toString()
-            }  AND ${filter.getDouble("fromEpoch").toString()} AND " +
+              filter.getDouble("fromEpoch").toString()
+            }  AND ${filter.getDouble("toEpoch").toString()} AND " +
               "${CallLog.Calls.DURATION} = 0 AND ${CallLog.Calls.TYPE} = ${CallLog.Calls.OUTGOING_TYPE}";
 
           } else {
@@ -121,8 +121,8 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) :
         selectionQuery =
           if (filter.getDouble("fromEpoch") > 0.0 && filter.getDouble("toEpoch") > 0.0) {
             "${CallLog.Calls.DATE} BETWEEN ${
-              filter.getDouble("toEpoch").toString()
-            }  AND ${filter.getDouble("fromEpoch").toString()}" +
+              filter.getDouble("fromEpoch").toString()
+            }  AND ${filter.getDouble("toEpoch").toString()}" +
               " AND ${CallLog.Calls.NUMBER} LIKE '%${filter.getString("phoneNumber")}%'";
 
           } else {
@@ -178,8 +178,8 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) :
         selectionQuery =
           if (filter.getDouble("fromEpoch") > 0.0 && filter.getDouble("toEpoch") > 0.0) {
             "${CallLog.Calls.DATE} BETWEEN ${
-              filter.getDouble("toEpoch").toString()
-            }  AND ${filter.getDouble("fromEpoch").toString()} AND " +
+              filter.getDouble("fromEpoch").toString()
+            }  AND ${filter.getDouble("toEpoch").toString()} AND " +
               "${CallLog.Calls.TYPE} = ${CallLog.Calls.ANSWERED_EXTERNALLY_TYPE}";
 
           } else {
@@ -200,8 +200,8 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) :
         selectionQuery =
           if (filter.getDouble("fromEpoch") > 0.0 && filter.getDouble("toEpoch") > 0.0) {
             "${CallLog.Calls.DATE} BETWEEN ${
-              filter.getDouble("toEpoch").toString()
-            }  AND ${filter.getDouble("fromEpoch").toString()} AND " +
+              filter.getDouble("fromEpoch").toString()
+            }  AND ${filter.getDouble("toEpoch").toString()} AND " +
               "${CallLog.Calls.TYPE} = ${CallLog.Calls.BLOCKED_TYPE}";
 
           } else {
@@ -222,8 +222,8 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) :
         selectionQuery =
           if (filter.getDouble("fromEpoch") > 0.0 && filter.getDouble("toEpoch") > 0.0) {
             "${CallLog.Calls.DATE} BETWEEN ${
-              filter.getDouble("toEpoch").toString()
-            }  AND ${filter.getDouble("fromEpoch").toString()} AND " +
+              filter.getDouble("fromEpoch").toString()
+            }  AND ${filter.getDouble("toEpoch").toString()} AND " +
               "${CallLog.Calls.TYPE} = ${CallLog.Calls.REJECTED_TYPE}";
 
           } else {
@@ -244,8 +244,8 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) :
         selectionQuery =
           if (filter.getDouble("fromEpoch") > 0.0 && filter.getDouble("toEpoch") > 0.0) {
             "${CallLog.Calls.DATE} BETWEEN ${
-              filter.getDouble("toEpoch").toString()
-            }  AND ${filter.getDouble("fromEpoch").toString()} AND " +
+              filter.getDouble("fromEpoch").toString()
+            }  AND ${filter.getDouble("toEpoch").toString()} AND " +
               "${CallLog.Calls.TYPE} = ${CallLog.Calls.MISSED_TYPE}";
 
           } else {
@@ -266,8 +266,8 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) :
         selectionQuery =
           if (filter.getDouble("fromEpoch") > 0.0 && filter.getDouble("toEpoch") > 0.0) {
             "${CallLog.Calls.DATE} BETWEEN ${
-              filter.getDouble("toEpoch").toString()
-            }  AND ${filter.getDouble("fromEpoch").toString()} AND " +
+              filter.getDouble("fromEpoch").toString()
+            }  AND ${filter.getDouble("toEpoch").toString()} AND " +
               "${CallLog.Calls.TYPE} = ${CallLog.Calls.INCOMING_TYPE}";
 
           } else {
@@ -288,8 +288,8 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) :
         selectionQuery =
           if (filter.getDouble("fromEpoch") > 0.0 && filter.getDouble("toEpoch") > 0.0) {
             "${CallLog.Calls.DATE} BETWEEN ${
-              filter.getDouble("toEpoch").toString()
-            }  AND ${filter.getDouble("fromEpoch").toString()} AND " +
+              filter.getDouble("fromEpoch").toString()
+            }  AND ${filter.getDouble("toEpoch").toString()} AND " +
               "${CallLog.Calls.TYPE} = ${CallLog.Calls.OUTGOING_TYPE}";
 
           } else {
@@ -310,8 +310,8 @@ class RnCallLogsModule(private val reactContext: ReactApplicationContext) :
         selectionQuery =
           if (filter.getDouble("fromEpoch") > 0.0 && filter.getDouble("toEpoch") > 0.0) {
             "${CallLog.Calls.DATE} BETWEEN ${
-              filter.getDouble("toEpoch").toString()
-            }  AND ${filter.getDouble("fromEpoch").toString()}";
+              filter.getDouble("fromEpoch").toString()
+            }  AND ${filter.getDouble("toEpoch").toString()}";
 
           } else {
             ""
