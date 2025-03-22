@@ -1,8 +1,11 @@
 # rn-call-logs  [NOT ACTIVELY MAINTAINED]
 
+------------
 **Notice:** This package is no longer maintained.
 
 ####  I am no longer actively maintaining this repository, and there will be no further contributions or updates from my side. Please consider migrating to an alternative package that suits your needs.
+
+------------
 
 Simple react-native package for reading call logs from Android Devices(**Only works with Android**)
 
